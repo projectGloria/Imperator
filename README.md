@@ -91,15 +91,21 @@ Completion is calculated over home-village heroes, troops, spells and siege mach
 
 Builder Base units, pets, super troops and hero equipment are left out. Builder Base data is still kept in memory for a later section.
 
-## Placeholder art
+## Artwork
 
-No Supercell artwork is used. Every unit or Town Hall icon sits in an `ImageSlot` (dashed outline) in `src/components/ImageSlot.tsx`. To use your own images, put them in `public/art/...` and pass `src`. The CSP only allows local images.
+Every picture comes from `ImageSlot` (`src/components/ImageSlot.tsx`), in this order:
+1. **Your file in `art/`**: official unit, hero, spell and building art from Supercell's Fan Kit (fankit.supercell.com), which you download yourself. Files work with their original names (`Icon_HV_Hog_Rider.png`, `Building_HV_Cannon_level_12.png`); the mapping is in `src/lib/fanKit.ts`. You can also name files yourself (`hog-rider.png`). [art/README.md](art/README.md) has step-by-step download instructions.
+2. **Official images from the API**: clan badges (Clan, War, Dashboard) and league icons (Dashboard, Profile, member list). These load from `https://api-assets.clashofclans.com`, the only remote host the CSP allows for images. Rust also drops any image URL from the API that points elsewhere.
+3. **Otherwise**, a styled tile with a line icon. No emoji are used. This is also what you see when you're offline and an official image can't load.
+
+Files are bundled at build time (`import.meta.glob`), so the app needs no filesystem permission and the CSP still only allows local images. In dev, a new file appears after a reload. For the installed app, rebuild. Images in `art/` are gitignored.
 
 ## Security notes
 
 - Capabilities (`src-tauri/capabilities/default.json`) cover only the window controls and opening `https://developer.clashofclans.com/*`. Nothing else: no shell, no fs, no http plugin.
 - The `ApiKey` type has a redacted `Debug` and no `Display`. `.env` parse errors are never passed through, because they can contain the raw line.
 - API responses are cached in memory for 60 s. Refresh skips the cache.
+- CSP `img-src` is `'self' data: https://api-assets.clashofclans.com`. Official badges and league icons are fetched by the webview straight from Supercell's CDN, with no referrer. They're the only requests the webview makes outside the app.
 
 ## Layout
 

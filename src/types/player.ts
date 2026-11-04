@@ -15,11 +15,21 @@ export interface ClanSummary {
   tag: string;
   name: string;
   clanLevel: number;
+  badgeUrls?: IconUrls | null;
+}
+
+/** Official API image URLs. Rust drops any URL not on api-assets.clashofclans.com. */
+export interface IconUrls {
+  tiny?: string;
+  small?: string;
+  medium?: string;
+  large?: string;
 }
 
 export interface Named {
   id: number;
   name: string;
+  iconUrls?: IconUrls | null;
 }
 
 export interface Player {

@@ -1,3 +1,5 @@
+import type { IconUrls } from "./player";
+
 // Mirrors `War` / `WarClan` / `WarMember` / `WarAttack` in src-tauri/src/api/models.rs.
 
 /** "warLogPrivate" is synthesised by our Rust command from the API's 403. */
@@ -26,6 +28,7 @@ export interface WarClan {
   tag?: string | null;
   name?: string | null;
   clanLevel: number;
+  badgeUrls?: IconUrls | null;
   attacks: number;
   stars: number;
   destructionPercentage: number;

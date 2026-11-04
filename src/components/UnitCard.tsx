@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { Crown, FlaskConical, Hammer, Lock, Swords, TriangleAlert, type LucideIcon } from "lucide-react";
+import { Crown, FlaskConical, Hammer, Swords, TriangleAlert, type LucideIcon } from "lucide-react";
 import type { Category } from "../types/gameData";
 import type { UnitView } from "../lib/units";
 import { GlassCard } from "./GlassCard";
 import { ImageSlot } from "./ImageSlot";
 import { ProgressBar } from "./ProgressBar";
 
-// Placeholder icon per category. Swap for ImageSlot `src` once you have your own art.
+// Fallback icon per category, for units without an official image in art/.
 const ICON: Record<Category, LucideIcon> = {
   heroes: Crown,
   troops: Swords,
@@ -19,12 +19,6 @@ const TONE: Record<Category, "gold" | "elixir" | "dark"> = {
   spells: "elixir",
   siegeMachines: "gold",
 };
-const TINT: Record<Category, string> = {
-  heroes: "text-dark-300",
-  troops: "text-elixir-300",
-  spells: "text-elixir-400",
-  siegeMachines: "text-gold-300",
-};
 
 export function UnitCard({ unit }: { unit: UnitView }) {
   const tone = unit.maxed ? "maxed" : TONE[unit.category];
@@ -35,7 +29,14 @@ export function UnitCard({ unit }: { unit: UnitView }) {
         <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-emerald-400/40 shadow-[inset_0_0_30px_-10px_rgb(52_211_153/0.5)]" />
       )}
       <div className="flex items-start gap-3">
-        <ImageSlot icon={unit.locked ? Lock : ICON[unit.category]} alt={unit.name} tint={TINT[unit.category]} size={44} />
+        <ImageSlot
+          name={unit.name}
+          icon={ICON[unit.category]}
+          tone={TONE[unit.category]}
+          size={44}
+          // Locked units keep their picture but desaturated, so the grid still reads at a glance.
+          className={unit.locked ? "grayscale opacity-60" : ""}
+        />
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-semibold" title={unit.name}>{unit.name}</div>
           <div className="mt-0.5 flex items-baseline gap-1 tabular-nums">

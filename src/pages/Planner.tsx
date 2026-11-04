@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import {
-  ChevronDown, ChevronUp, CircleCheck, Construction, GripVertical, Hammer, HelpCircle, ListOrdered, Lock, TriangleAlert, TrendingUp,
+  Bomb, BrickWall, Castle, Coins, Crown, FlaskConical, Shield, Swords, type LucideIcon,
+  Check, ChevronDown, ChevronUp, CircleCheck, Construction, GripVertical, Hammer, HelpCircle, ListOrdered, Lock, TriangleAlert, TrendingUp,
 } from "lucide-react";
 import type { GameData } from "../types/gameData";
 import type { VillageSnapshot } from "../types/village";
@@ -14,6 +15,14 @@ import { ProgressBar } from "../components/ProgressBar";
 import { StatTile } from "../components/StatTile";
 import { Unverified } from "../components/UpgradeList";
 import { Skeleton } from "../components/Skeleton";
+import { ImageSlot, type SlotTone } from "../components/ImageSlot";
+
+// Category → default tile colour, matching the Profile cards (heroes dark, lab elixir, buildings gold).
+// Line-icon fallback per category, for anything without an official image.
+const CATEGORY_ICON: Record<string, LucideIcon> = {
+  heroes: Crown, lab: FlaskConical, defenses: Shield, army: Swords, traps: Bomb, resources: Coins, walls: BrickWall, other: Hammer,
+};
+const TONE: Record<string, SlotTone> = { heroes: "dark", lab: "elixir", traps: "neutral", walls: "neutral", other: "neutral" };
 
 // Module-level → stable fetcher identity for useResource.
 const fetchPrefs = () => api.getPlannerPrefs();
@@ -197,7 +206,7 @@ function PriorityItem({
       </button>
       <span className="w-4 text-center text-xs tabular-nums text-gold-300">{rank}</span>
       <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
-      <span className={`text-xs tabular-nums ${left ? "text-white/50" : "text-maxed-400"}`}>{left ? left : "✓"}</span>
+      <span className={`text-xs tabular-nums ${left ? "text-white/50" : "text-maxed-400"}`}>{left ? left : <Check size={13} />}</span>
       <div className="flex flex-col">
         <button type="button" aria-label={`Move ${label} up`} disabled={first} onClick={() => onMove(id, -1)} className="text-white/40 hover:text-white disabled:opacity-20">
           <ChevronUp size={14} />
@@ -270,8 +279,9 @@ function Row({ r }: { r: PlanRow }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_120px] items-center gap-4 border-b border-white/[0.04] px-5 py-3 text-sm last:border-b-0"
+      className="grid grid-cols-[40px_minmax(0,1.3fr)_minmax(0,1fr)_120px] items-center gap-4 border-b border-white/[0.04] px-5 py-3 text-sm last:border-b-0"
     >
+      <ImageSlot name={r.known ? r.name : undefined} level={r.levels[0]?.lvl || undefined} icon={r.known ? CATEGORY_ICON[r.category] ?? Castle : HelpCircle} size={40} tone={TONE[r.category] ?? "gold"} />
       <div className="min-w-0">
         <div className={`truncate font-medium ${r.known ? "" : "text-white/50"}`}>
           {r.name}

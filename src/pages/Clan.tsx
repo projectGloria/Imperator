@@ -7,6 +7,7 @@ import { CLAN_TYPE_LABEL, DEFAULT_DIR, filterMembers, sortMembers, type Sort, ty
 import { fmtNum, roleLabel } from "../lib/format";
 import { GlassCard } from "../components/GlassCard";
 import { ImageSlot } from "../components/ImageSlot";
+import { leagueIcon, pickIcon } from "../lib/art";
 import { RefreshBar } from "../components/RefreshBar";
 import { StatTile } from "../components/StatTile";
 import { ErrorBanner, ErrorScreen } from "../components/ErrorScreen";
@@ -53,7 +54,7 @@ function ClanView({ clan, myTag }: { clan: Clan; myTag: string }) {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6">
       <GlassCard glow="gold" lift={false} className="flex items-center gap-6 p-6">
-        <ImageSlot icon={Shield} alt="Clan badge" size={80} />
+        <ImageSlot art={["clan-badge"]} src={pickIcon(clan.badgeUrls)} icon={Shield} alt="Clan badge" size={80} tone="gold" />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-3">
             <h2 className="font-display text-2xl font-bold">{clan.name}</h2>
@@ -226,7 +227,9 @@ function MemberRow({ member: m, index, isMe }: { member: ClanMember; index: numb
       </span>
       <span className="text-right tabular-nums text-white/80">{m.townHallLevel ?? "—"}</span>
       <span className="flex items-center justify-end gap-1.5 tabular-nums">
-        <Trophy size={13} className="text-gold-400" /> {fmtNum(m.trophies)}
+        {/* League icon when the API has one; small size, lazy-loaded (50 rows). */}
+        <ImageSlot src={leagueIcon(m, "small")} icon={Trophy} alt={m.leagueTier?.name ?? m.league?.name ?? "League"} size={20} tone="gold" />
+        {fmtNum(m.trophies)}
       </span>
       <span className="flex items-center justify-end gap-1.5 tabular-nums text-emerald-300">
         <Gift size={13} /> {fmtNum(m.donations)}

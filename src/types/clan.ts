@@ -1,5 +1,5 @@
 // Mirrors `Clan` / `ClanMember` in src-tauri/src/api/models.rs.
-import type { Named } from "./player";
+import type { IconUrls, Named } from "./player";
 
 export type ClanRole = "leader" | "coLeader" | "admin" | "member";
 
@@ -39,6 +39,7 @@ export interface Clan {
   isWarLogPublic: boolean;
   warLeague?: Named | null;
   capitalLeague?: Named | null;
+  badgeUrls?: IconUrls | null;
   members: number;
   memberList: ClanMember[];
 }

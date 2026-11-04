@@ -8,6 +8,7 @@ import { outcome, parseApiTime, PHASE_LABEL, side, type Outcome, type Side } fro
 import { fmtCountdown } from "../lib/format";
 import { GlassCard } from "../components/GlassCard";
 import { ImageSlot } from "../components/ImageSlot";
+import { pickIcon } from "../lib/art";
 import { ProgressBar } from "../components/ProgressBar";
 import { RefreshBar } from "../components/RefreshBar";
 import { ErrorBanner, ErrorScreen } from "../components/ErrorScreen";
@@ -146,7 +147,8 @@ function SideScore({ s, maxStars, align }: { s: Side; maxStars: number; align: "
   return (
     <div className={`flex flex-col gap-4 ${right ? "items-end text-right" : ""}`}>
       <div className={`flex items-center gap-3 ${right ? "flex-row-reverse" : ""}`}>
-        <ImageSlot icon={Shield} alt="Clan badge" size={56} tint={right ? "text-elixir-300" : "text-gold-300"} />
+        {/* Opponents change every war, so they share one generic file. */}
+        <ImageSlot art={[right ? "opponent-badge" : "clan-badge"]} src={pickIcon(s.clan.badgeUrls)} icon={Shield} alt="Clan badge" size={56} tone={right ? "elixir" : "gold"} />
         <div className="min-w-0">
           <div className="truncate font-display text-xl font-bold">{s.clan.name}</div>
           <div className="select-text text-xs text-white/45">
@@ -305,7 +307,7 @@ function LineupRow({
       )}
 
       {/* Defence: the best attack this base has taken. */}
-      <div className="flex w-16 items-center justify-end gap-1" title={def ? `Best attack against: ${def.stars}★ ${def.destructionPercentage}%` : "Not attacked yet"}>
+      <div className="flex w-16 items-center justify-end gap-1" title={def ? `Best attack against: ${def.stars} stars, ${def.destructionPercentage}%` : "Not attacked yet"}>
         {showAttacks && def ? (
           <>
             <ShieldHalf size={13} className="text-white/35" />
@@ -326,7 +328,7 @@ function Stars({ n, dim = false }: { n: number; dim?: boolean }) {
         <Star
           key={k}
           size={12}
-          // Filled vs outline instead of hiding stars, so "1★" still reads as "1 of 3".
+          // Filled vs outline instead of hiding stars, so 1 star still reads as "1 of 3".
           fill={k < n ? "currentColor" : "none"}
           className={k < n ? (dim ? "text-white/60" : "text-gold-400") : "text-white/20"}
         />

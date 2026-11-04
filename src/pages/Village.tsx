@@ -1,6 +1,6 @@
 import { useActionState, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Camera, ClipboardPaste, Hammer, Hourglass, TriangleAlert, Upload, X } from "lucide-react";
+import { Camera, Castle, ClipboardPaste, Hammer, HelpCircle, Hourglass, TriangleAlert, Upload, X } from "lucide-react";
 import type { GameData } from "../types/gameData";
 import type { VillageSnapshot } from "../types/village";
 import type { Resource } from "../hooks/useResource";
@@ -11,6 +11,7 @@ import { useNow } from "../hooks/useNow";
 import { GlassCard } from "../components/GlassCard";
 import { UpgradeList, Unverified } from "../components/UpgradeList";
 import { ErrorBanner } from "../components/ErrorScreen";
+import { ImageSlot } from "../components/ImageSlot";
 import { Skeleton } from "../components/Skeleton";
 
 export function VillagePage({
@@ -252,8 +253,15 @@ function GroupCard({ g }: { g: Group }) {
   const top = g.levels[0]?.lvl ?? 0;
   return (
     <GlassCard glow="gold" className="p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
+      <div className="flex items-start gap-3">
+        <ImageSlot
+          name={g.known ? g.name : undefined}
+          level={top || undefined}
+          icon={g.known ? Castle : HelpCircle}
+          size={44}
+          tone={g.known ? "gold" : "neutral"}
+        />
+        <div className="min-w-0 flex-1">
           <div className={`truncate text-sm font-semibold ${g.known ? "" : "text-white/50"}`} title={g.known ? undefined : "Add this ID to ids.names in data/game-data.json"}>
             {g.name}
             {g.unverified && <Unverified />}
@@ -267,7 +275,7 @@ function GroupCard({ g }: { g: Group }) {
             )}
           </div>
         </div>
-        <span className="rounded-lg bg-gold-400/10 px-2 py-0.5 font-display text-sm font-bold tabular-nums text-gold-300">
+        <span className="shrink-0 rounded-lg bg-gold-400/10 px-2 py-0.5 font-display text-sm font-bold tabular-nums text-gold-300">
           {top === 0 ? "New" : `Lv ${top}`}
         </span>
       </div>

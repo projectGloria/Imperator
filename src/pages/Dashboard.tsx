@@ -10,6 +10,7 @@ import { GlassCard } from "../components/GlassCard";
 import { ProgressRing } from "../components/ProgressRing";
 import { StatTile } from "../components/StatTile";
 import { ImageSlot } from "../components/ImageSlot";
+import { leagueIcon, pickIcon, townHallArt } from "../lib/art";
 
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
 const RING_TONE = { heroes: "dark", troops: "elixir", spells: "elixir", siegeMachines: "gold" } as const;
@@ -41,7 +42,7 @@ export function Dashboard({
         <div className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-gold-400/10 blur-3xl" />
         <div className="relative flex items-center gap-8">
           <div className="flex items-center gap-5">
-            <ImageSlot icon={Castle} alt={`Town Hall ${player.townHallLevel}`} size={88} />
+            <ImageSlot art={townHallArt(player.townHallLevel)} icon={Castle} alt={`Town Hall ${player.townHallLevel}`} size={88} tone="gold" />
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-white/50">Town Hall</div>
               <div className="text-gold-gradient font-display text-6xl font-black leading-none">{player.townHallLevel}</div>
@@ -69,9 +70,16 @@ export function Dashboard({
       <div className="grid grid-cols-4 gap-4">
         <StatTile icon={Trophy} label="Trophies" value={fmtNum(player.trophies)} sub={`Best ${fmtNum(player.bestTrophies)}`} tone="gold" />
         <StatTile icon={Star} label="War stars" value={fmtNum(player.warStars)} tone="gold" />
-        <StatTile icon={Medal} label="League" value={<span className="text-lg">{league}</span>} tone="elixir" />
+        <StatTile
+          icon={Medal}
+          label="League"
+          value={<span className="text-lg">{league}</span>}
+          tone="elixir"
+          media={<ImageSlot src={leagueIcon(player)} icon={Medal} alt={league} size={48} tone="elixir" />}
+        />
         <StatTile
           icon={Shield}
+          media={<ImageSlot art={["clan-badge"]} src={pickIcon(player.clan?.badgeUrls)} icon={Shield} alt="Clan badge" size={48} tone="dark" />}
           label="Clan"
           value={<span className="text-lg">{player.clan?.name ?? "—"}</span>}
           sub={player.clan ? `Level ${player.clan.clanLevel} · ${player.clan.tag}` : undefined}

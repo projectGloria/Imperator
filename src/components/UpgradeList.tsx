@@ -3,6 +3,7 @@ import { CircleCheck, FlaskConical, Hammer, PawPrint, Sparkles, type LucideIcon 
 import type { Upgrade, UpgradeSource } from "../lib/village";
 import { useNow } from "../hooks/useNow";
 import { fmtCountdown } from "../lib/format";
+import { ImageSlot } from "./ImageSlot";
 
 const SOURCE_ICON: Record<UpgradeSource, LucideIcon> = {
   Builder: Hammer,
@@ -33,9 +34,14 @@ export function UpgradeList({ items, limit }: { items: Upgrade[]; limit?: number
               animate={{ opacity: 1, x: 0, transition: { delay: i * 0.03 } }}
               className="flex items-center gap-3 py-2.5"
             >
-              <div className={`grid size-9 shrink-0 place-items-center rounded-lg ${u.source === "Builder" ? "bg-gold-400/10 text-gold-300" : "bg-elixir-500/10 text-elixir-300"}`}>
-                <Icon size={16} />
-              </div>
+              <ImageSlot
+                name={u.known ? u.name : undefined}
+                // Buildings show their current level's art (lab units ignore it: no per-level files).
+                level={u.source === "Builder" && u.from ? u.from : undefined}
+                icon={Icon}
+                size={38}
+                tone={u.source === "Builder" ? "gold" : "elixir"}
+              />
               <div className="min-w-0 flex-1">
                 <div className={`truncate text-sm font-medium ${u.known ? "" : "text-white/50"}`}>
                   {u.name}

@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
-import { Gift, HandHeart, Shield, Swords, ShieldCheck, User } from "lucide-react";
+import { Gift, HandHeart, Medal, Shield, Swords, ShieldCheck, User } from "lucide-react";
 import type { Player } from "../types/player";
 import { CATEGORIES, CATEGORY_LABEL, type Roster } from "../lib/units";
 import { fmtNum, roleLabel } from "../lib/format";
 import { GlassCard } from "../components/GlassCard";
 import { ImageSlot } from "../components/ImageSlot";
+import { leagueIcon } from "../lib/art";
 import { UnitGrid } from "../components/UnitGrid";
 
 export function Profile({ player, roster }: { player: Player; roster: Roster }) {
@@ -13,14 +14,17 @@ export function Profile({ player, roster }: { player: Player; roster: Roster }) 
     <div className="space-y-8">
       <motion.div initial="hidden" animate="show">
         <GlassCard glow="gold" lift={false} className="flex items-center gap-6 p-6">
-          <ImageSlot icon={User} alt="Player avatar" size={72} />
+          <ImageSlot art={["avatar"]} icon={User} alt="Player avatar" size={72} tone="gold" />
           <div className="min-w-0 flex-1">
             <div className="font-display text-2xl font-bold">{player.name}</div>
             <div className="mt-0.5 select-text text-sm text-white/55">{player.tag}</div>
             <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/70">
               <span>XP level <b className="text-white">{player.expLevel}</b></span>
               <span>TH <b className="text-gold-300">{player.townHallLevel}</b></span>
-              <span>League <b className="text-white">{league}</b></span>
+              <span className="inline-flex items-center gap-1.5">
+                League <ImageSlot src={leagueIcon(player, "small")} icon={Medal} alt={league} size={22} tone="elixir" />
+                <b className="text-white">{league}</b>
+              </span>
               <span>War pref <b className="text-white">{player.warPreference === "in" ? "In" : player.warPreference === "out" ? "Out" : "—"}</b></span>
             </div>
           </div>

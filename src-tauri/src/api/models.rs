@@ -3,7 +3,8 @@
 //! Deserialising into these (rather than passing raw JSON through) validates the
 //! shape at the boundary; unknown fields are ignored so API additions don't break us.
 //! Everything not guaranteed by the docs is `Option` / `#[serde(default)]`.
-//! Icon URLs are intentionally NOT modelled: they point to Supercell art we don't use.
+//! Image URLs (badges, league icons) are modelled as `IconUrls` and filtered to Supercell's
+//! official asset host at the boundary; the CSP allows only that host too.
 
 use serde::{Deserialize, Serialize};
 
@@ -59,6 +60,8 @@ pub struct ClanSummary {
     pub name: String,
     #[serde(default)]
     pub clan_level: u32,
+    #[serde(default)]
+    pub badge_urls: Option<IconUrls>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -66,6 +69,32 @@ pub struct ClanSummary {
 pub struct Named {
     pub id: u64,
     pub name: String,
+    /// Present on leagues; absent on locations, languages, war leagues.
+    #[serde(default)]
+    pub icon_urls: Option<IconUrls>,
+}
+
+/// Official image URLs from the API (clan badges: small/medium/large; leagues: tiny/small/medium/large).
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct IconUrls {
+    #[serde(default, deserialize_with = "official_url", skip_serializing_if = "Option::is_none")]
+    pub tiny: Option<String>,
+    #[serde(default, deserialize_with = "official_url", skip_serializing_if = "Option::is_none")]
+    pub small: Option<String>,
+    #[serde(default, deserialize_with = "official_url", skip_serializing_if = "Option::is_none")]
+    pub medium: Option<String>,
+    #[serde(default, deserialize_with = "official_url", skip_serializing_if = "Option::is_none")]
+    pub large: Option<String>,
+}
+
+/// Supercell's CDN for API images. Must match `img-src` in tauri.conf.json.
+pub const ASSET_HOST: &str = "https://api-assets.clashofclans.com/";
+
+/// Keep a URL only if it points at the official asset host. Defence in depth: the CSP
+/// already blocks other hosts, but this way a surprising URL never even reaches the UI.
+fn official_url<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<String>, D::Error> {
+    let url = Option::<String>::deserialize(d)?;
+    Ok(url.filter(|u| u.starts_with(ASSET_HOST)))
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -90,7 +119,7 @@ pub struct Cached<T> {
     pub from_cache: bool,
 }
 
-/// GET /clans/{tag}. Badge URLs are deliberately not modelled (Supercell art).
+/// GET /clans/{tag}.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Clan {
@@ -131,6 +160,8 @@ pub struct Clan {
     pub war_league: Option<Named>,
     #[serde(default)]
     pub capital_league: Option<Named>,
+    #[serde(default)]
+    pub badge_urls: Option<IconUrls>,
     /// Member count (0..=50).
     pub members: u32,
     #[serde(default)]
@@ -200,6 +231,8 @@ pub struct WarClan {
     #[serde(default)]
     pub clan_level: u32,
     #[serde(default)]
+    pub badge_urls: Option<IconUrls>,
+    #[serde(default)]
     pub attacks: u32,
     #[serde(default)]
     pub stars: u32,
@@ -240,4 +273,22 @@ pub struct WarAttack {
     pub order: u32,
     #[serde(default)]
     pub duration: Option<u32>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn icon_urls_keep_only_official_host() {
+        let u: IconUrls = serde_json::from_value(serde_json::json!({
+            "small": "https://api-assets.clashofclans.com/badges/70/x.png",
+            "large": "https://evil.example/x.png",
+            "medium": null
+        }))
+        .unwrap();
+        assert!(u.small.is_some());
+        assert!(u.large.is_none());
+        assert!(u.medium.is_none());
+    }
 }
