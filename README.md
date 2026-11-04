@@ -10,34 +10,106 @@ Personal Clash of Clans companion for Windows, built with Tauri 2 and React.
 [![Tauri](https://img.shields.io/badge/Tauri-v2-24C8DB?logo=tauri&logoColor=white)](https://tauri.app/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Rust](https://img.shields.io/badge/Rust-MSVC-DEA584?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 
-[About](#about) · [Features](#features) · [Screenshots](#screenshots) · [Prerequisites](#prerequisites) · [Installation](#installation) · [Development Setup](#development-setup) · [Usage](#usage) · [Building from Source](#building-from-source) · [Configuration & Game Data](#configuration--game-data) · [Security Architecture](#security-architecture) · [Contributing](#contributing) · [License & Credits](#license--credits)
+[About](#about) · [Features](#features) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Prerequisites](#prerequisites) · [Installation](#installation) · [Development Setup](#development-setup) · [Usage](#usage) · [Building from Source](#building-from-source) · [Configuration & Game Data](#configuration--game-data) · [Security](#security) · [Contributing](#contributing) · [License & Credits](#license--credits)
 
 </div>
 
-<!-- TODO: add screenshot of the Imperator dashboard at docs/assets/dashboard.png -->
+<p align="center">
+  <img src="docs/assets/dashboard.png" alt="Imperator Clash of Clans companion dashboard" width="900" />
+</p>
 
 ## About
 
-Imperator is a local-only desktop companion for Clash of Clans players on Windows. It combines live Supercell API data with exported village snapshots to track upgrade progress, countdown timers, clan rosters, and clan wars in a clean desktop interface.
+Imperator is a private, local-only desktop companion for Clash of Clans players on Windows. It combines live Supercell API data with exported village snapshots to track upgrade progress, live countdown timers, clan rosters, and clan wars in an interface designed specifically for the desktop.
 
-Unlike web dashboards or cloud trackers, Imperator requires no accounts, runs no server infrastructure, and collects zero telemetry. All API requests are proxied and authenticated directly through the compiled Rust backend—keeping credentials off the webview and strictly on your machine.
+Unlike cloud trackers and web dashboards, Imperator requires no third-party accounts, runs zero server infrastructure, and collects no telemetry. All API requests are proxied and authenticated directly through the compiled Rust backend—keeping your credentials strictly on your machine and off the webview.
 
 ## Features
 
-- **Local-Only Privacy**: Zero telemetry, no third-party servers, and no user accounts. Your API key never leaves your machine or touches the webview layer.
-- **Village Snapshot Import & Timers**: Parse in-game village JSON export data directly into live upgrade countdowns and building level breakdowns.
-- **Town Hall Upgrade Planner**: Reorderable upgrade planner calculates remaining laboratory, hero, and building upgrades against Town Hall caps defined in [data/game-data.json](data/game-data.json).
-- **Clan & War Overview**: Explore clan rosters with sorting and search filters, review current War lineups, track attacks, and inspect scoreboard metrics.
-- **Progress Tracking**: Automatic completion percentage metrics calculating progress across home-village heroes, troops, spells, and siege machines against per-TH caps.
-- **Flexible Artwork Pipeline**: Native asset resolution supporting official local Supercell Fan Kit art in `art/`, remote CDN clan badges and league crests, and vector line icon fallbacks.
-- **IP Mismatch Detection**: Built-in public IP detector alerts you when your external IP shifts away from your Supercell Developer Portal token whitelist.
+- **Local-Only Privacy**: Zero telemetry, no third-party servers, and no user accounts. Your API token never enters the webview layer or leaves your device.
+- **Village Snapshot Import & Live Timers**: Parses in-game village JSON exports into active builder and laboratory countdowns with real-time level breakdowns.
+- **Town Hall Upgrade Planner**: Reorderable upgrade planner calculates remaining laboratory, hero, defense, and building upgrades against Town Hall caps defined in [data/game-data.json](data/game-data.json).
+- **Clan & War Tracking**: Browse clan rosters with search and sorting filters, inspect current War lineups, and review destruction percentages, attack logs, and scoreboards.
+- **Progress Tracking**: Automatic completion percentages calculate your progress across home-village heroes, troops, spells, and siege machines against per-TH caps.
+- **Native Fan Kit Artwork**: Native asset resolution supporting official local Supercell Fan Kit art in `art/`, remote CDN clan badges and league crests, and vector line icon fallbacks.
+- **IP Mismatch Detection**: Built-in public IP detector alerts you when your current IP shifts away from your Supercell Developer Portal token whitelist.
 
 ## Screenshots
 
-<!-- TODO: add screenshot of the Imperator dashboard at docs/assets/dashboard.png -->
-<!-- TODO: add screenshot of the Imperator profile view at docs/assets/profile.png -->
-<!-- TODO: add screenshot of the upgrade planner at docs/assets/planner.png -->
+<p align="center">
+  <img src="docs/assets/dashboard.png" alt="Imperator dashboard overview" width="880" />
+  <br /><em>Dashboard: Town Hall status, overall completion rings, active builder countdowns, and trophy statistics.</em>
+</p>
+
+<p align="center">
+  <img src="docs/assets/village.png" alt="Village snapshot and upgrade timers" width="880" />
+  <br /><em>Village: Parsed snapshot countdowns, builder and laboratory queues, and building level distribution.</em>
+</p>
+
+<p align="center">
+  <img src="docs/assets/planner.png" alt="Town Hall upgrade planner" width="880" />
+  <br /><em>Planner: Customizable upgrade roadmap prioritized by category, calculating remaining level-ups to TH max.</em>
+</p>
+
+<p align="center">
+  <img src="docs/assets/clan.png" alt="Clan roster and statistics" width="880" />
+  <br /><em>Clan: Membership breakdown, member search and filtering, roles, trophies, and donation tracking.</em>
+</p>
+
+<p align="center">
+  <img src="docs/assets/war.png" alt="Clan war overview and lineup" width="880" />
+  <br /><em>War: Live clan war scoreboard, side-by-side member lineup destruction percentage, and attack logs.</em>
+</p>
+
+## Architecture
+
+Imperator enforces an isolated security model where the user interface runs in a sandboxed webview while network operations and credentials remain strictly contained within the native Rust backend. The frontend communicates with Rust over strongly-typed Tauri IPC commands, ensuring your Supercell API key is never exposed to the web runtime.
+
+```mermaid
+flowchart TD
+    subgraph UI ["Frontend (React 19 + TypeScript + Vite)"]
+        Dashboard["Dashboard View"]
+        Village["Village & Timers View"]
+        Planner["Upgrade Planner View"]
+        ClanWar["Clan & War Overview"]
+        ApiClient["Typed API Client (src/lib/api.ts)"]
+        Dashboard --> ApiClient
+        Village --> ApiClient
+        Planner --> ApiClient
+        ClanWar --> ApiClient
+    end
+
+    subgraph Tauri ["Tauri 2 IPC Boundary"]
+        IPC["Typed Tauri Commands"]
+        CSP["Content Security Policy (Strict Sandbox)"]
+    end
+
+    subgraph RustCore ["Rust Core Backend"]
+        Cmds["Command Handlers (src-tauri/src/api)"]
+        Cache["In-Memory Cache (60s TTL)"]
+        Http["Secure HTTP Client (reqwest + rustls)"]
+        Storage["Local JSON Storage (village, planner, game-data)"]
+        KeyStore["Redacted ApiKey Vault"]
+        Cmds --> Cache
+        Cache --> Http
+        Cmds --> Storage
+        KeyStore --> Http
+    end
+
+    subgraph External ["External Services"]
+        Supercell["Supercell API (api.clashofclans.com)"]
+        CDN["Supercell Assets CDN (api-assets.clashofclans.com)"]
+        IpService["Public IP Verifier (api.ipify.org)"]
+    end
+
+    ApiClient -->|"invoke('cmd', args)"| IPC
+    IPC --> Cmds
+    Http -->|"Bearer Token (Encrypted TLS)"| Supercell
+    Http -->|"IP Whitelist Verification"| IpService
+    UI -.->|"Allowed img-src only"| CDN
+```
 
 ## Prerequisites
 
@@ -146,7 +218,7 @@ Game caps and unit IDs are defined in [data/game-data.json](data/game-data.json)
 - Units or levels marked with `_todo` in the JSON are unverified entries that can be edited by hand.
 - In production builds, this file is copied to `%APPDATA%\com.imperator.app\data\game-data.json` on initial execution. Hand modifications take effect upon clicking the app's Refresh button.
 
-## Security Architecture
+## Security
 
 Imperator adheres to strict security and least-privilege principles:
 

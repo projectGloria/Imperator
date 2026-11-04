@@ -1,116 +1,177 @@
+<div align="center">
+
+<img src="src-tauri/icons/128x128.png" alt="Imperator logo" width="112" />
+
 # Imperator
 
-Personal Clash of Clans companion for Windows. Tauri 2 + React 19 + TypeScript. Local only: no server, no accounts, no telemetry.
+Personal Clash of Clans companion for Windows, built with Tauri 2 and React.
 
-All Supercell API calls run in Rust. The webview never sees the API key.
+[![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows&logoColor=white)](https://github.com/projectGloria/Imperator)
+[![Tauri](https://img.shields.io/badge/Tauri-v2-24C8DB?logo=tauri&logoColor=white)](https://tauri.app/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+[About](#about) · [Features](#features) · [Screenshots](#screenshots) · [Prerequisites](#prerequisites) · [Installation](#installation) · [Development Setup](#development-setup) · [Usage](#usage) · [Building from Source](#building-from-source) · [Configuration & Game Data](#configuration--game-data) · [Security Architecture](#security-architecture) · [Contributing](#contributing) · [License & Credits](#license--credits)
+
+</div>
+
+<!-- TODO: add screenshot of the Imperator dashboard at docs/assets/dashboard.png -->
+
+## About
+
+Imperator is a local-only desktop companion for Clash of Clans players on Windows. It combines live Supercell API data with exported village snapshots to track upgrade progress, countdown timers, clan rosters, and clan wars in a clean desktop interface.
+
+Unlike web dashboards or cloud trackers, Imperator requires no accounts, runs no server infrastructure, and collects zero telemetry. All API requests are proxied and authenticated directly through the compiled Rust backend—keeping credentials off the webview and strictly on your machine.
+
+## Features
+
+- **Local-Only Privacy**: Zero telemetry, no third-party servers, and no user accounts. Your API key never leaves your machine or touches the webview layer.
+- **Village Snapshot Import & Timers**: Parse in-game village JSON export data directly into live upgrade countdowns and building level breakdowns.
+- **Town Hall Upgrade Planner**: Reorderable upgrade planner calculates remaining laboratory, hero, and building upgrades against Town Hall caps defined in [data/game-data.json](data/game-data.json).
+- **Clan & War Overview**: Explore clan rosters with sorting and search filters, review current War lineups, track attacks, and inspect scoreboard metrics.
+- **Progress Tracking**: Automatic completion percentage metrics calculating progress across home-village heroes, troops, spells, and siege machines against per-TH caps.
+- **Flexible Artwork Pipeline**: Native asset resolution supporting official local Supercell Fan Kit art in `art/`, remote CDN clan badges and league crests, and vector line icon fallbacks.
+- **IP Mismatch Detection**: Built-in public IP detector alerts you when your external IP shifts away from your Supercell Developer Portal token whitelist.
+
+## Screenshots
+
+<!-- TODO: add screenshot of the Imperator dashboard at docs/assets/dashboard.png -->
+<!-- TODO: add screenshot of the Imperator profile view at docs/assets/profile.png -->
+<!-- TODO: add screenshot of the upgrade planner at docs/assets/planner.png -->
 
 ## Prerequisites
 
-- Node.js 20+ and npm
-- Rust (stable) with the MSVC toolchain. `cargo` must be on your PATH. If it isn't, add `%USERPROFILE%\.cargo\bin`.
-- WebView2 (ships with Windows 11)
+- **Operating System**: Windows 10 (version 1809+) or Windows 11 with WebView2 runtime (pre-installed on Windows 11).
+- **For Development & Building**:
+  - [Node.js](https://nodejs.org/) 20+ and `npm`
+  - [Rust](https://www.rust-lang.org/) stable toolchain with the MSVC target (`x86_64-pc-windows-msvc`), ensuring `cargo` is available in your PATH (`%USERPROFILE%\.cargo\bin`).
+- **Clash of Clans API Key**: Obtain a developer API key and your player tag from the [Supercell Developer Portal](https://developer.clashofclans.com). The key must be whitelisted for your current public IP address.
 
-## Setup (dev)
+## Installation
+
+### Packaged Installer
+
+1. Download the latest installer (`.exe`) from the repository releases (or compile locally via [Building from Source](#building-from-source)).
+2. Run the NSIS installer to install Imperator on Windows.
+3. On first launch, enter your Supercell Developer API Key and Player Tag in the setup wizard. Configuration is saved locally to:
+   ```
+   %APPDATA%\com.imperator.app\.env
+   ```
+
+## Development Setup
+
+Clone the repository and install frontend dependencies:
 
 ```powershell
+git clone https://github.com/projectGloria/Imperator.git
+cd Imperator
 npm install
+```
+
+Copy the example environment file and configure your credentials:
+
+```powershell
 copy .env.example .env
 ```
 
-Edit `.env` in the project root:
+Edit `.env` in the project root with your credentials:
 
-```
+```env
 COC_API_KEY=<your key from developer.clashofclans.com>
 COC_PLAYER_TAG="#XXXXXXXX"
 ```
 
-The key is bound to your public IP. If your IP changes, the app shows your current IP and a link to update the key.
+> [!NOTE]
+> Keep quotes around the player tag. In `.env` syntax, an unquoted `#` is treated as a comment delimiter.
+
+Launch the application in development mode:
 
 ```powershell
 npm run tauri dev
 ```
 
-### Testing the Setup screen in dev
+### Testing the Setup Screen in Development
 
-In dev builds the Setup form won't overwrite your root `.env`. To exercise the form, point the app at a throwaway folder:
+In debug mode, Imperator protects the root `.env` from being modified by the UI setup form. To test the setup wizard without modifying your root `.env`, point the configuration directory to a temporary path:
 
 ```powershell
 $env:IMPERATOR_CONFIG_DIR = "$env:TEMP\imperator-test"; npm run tauri dev
 ```
 
-This override is compiled out of release builds.
+*(This environment variable override is compiled out of release builds.)*
 
-## Build the installer
+## Usage
+
+### 1. Village Snapshot Import
+Because the public Supercell API does not provide active builder upgrade timers, countdowns are imported directly from your game export:
+1. Open Clash of Clans on your device, export your village data as JSON, and copy the text.
+2. Navigate to the **Village** page in Imperator.
+3. Paste the snapshot JSON into the import dialog.
+4. Imperator validates the data in Rust, stores the snapshot locally at `data/village.json` (or `%APPDATA%\com.imperator.app\data\village.json` in packaged builds), and calculates real-time upgrade countdowns.
+
+### 2. Town Hall Upgrade Planner
+1. Open the **Planner** page to see missing upgrades needed to reach the max level for your current Town Hall level.
+2. Drag categories or use the arrow buttons to prioritize your upgrade paths (e.g. Defenses, Heroes, Laboratory). Preferences are persisted locally in `data/planner.json`.
+
+### 3. Adding Official Artwork
+Imperator can render official high-resolution game assets through Supercell's Fan Kit:
+1. Visit [Supercell Fan Kit](https://fankit.supercell.com) and download unit, hero, building, or spell assets.
+2. Place PNG assets directly into the `art/` folder (keep Fan Kit filenames such as `Icon_HV_Hog_Rider.png` or `Building_HV_Cannon_level_12.png`).
+3. For custom names, refer to the naming conventions in [art/README.md](art/README.md).
+4. Reload the dev application or rebuild the binary to bundle the assets.
+
+## Building from Source
+
+To compile the standalone production installer for Windows:
 
 ```powershell
 npm run tauri build
 ```
 
-The NSIS installer ends up in `src-tauri/target/release/bundle/nsis/`.
-
-The packaged app does **not** contain your `.env`. On first launch it shows a setup screen and writes the file to:
-
+The resulting NSIS installer executable will be placed in:
 ```
-%APPDATA%\com.imperator.app\.env
+src-tauri/target/release/bundle/nsis/
 ```
 
-## Game data
+To run TypeScript verification without bundling:
 
-`data/game-data.json` holds the max level for each unit at each Town Hall, as a sparse step map (`"TH": cap`). It was written from memory and is **unverified**. Every entry marked `_todo` needs checking against the game. Edit it and click Refresh to apply the changes.
-
-- If a unit has no entry, its bar uses the API's global `maxLevel` and is flagged **unknown cap**.
-- If your level is above the listed cap, the card is flagged **check cap data**.
-- If a unit is listed for your TH but the API doesn't return it, it shows as *Not unlocked* and counts as level 0.
-- Packaged builds copy the file to `%APPDATA%\com.imperator.app\data\` on first run. Edit that copy.
-- `ids` maps the numeric IDs in the village export to names. IDs listed in `ids.unverified` are guesses and show a **?** badge. IDs with no name show as *Unknown #id*. Add them as you identify them.
-
-## Village import
-
-The API has no upgrade timers. They come from the game's own village export JSON, pasted on the Village page.
-- The paste is validated in Rust and saved as `data/village.json` (dev) or `%APPDATA%\com.imperator.app\data\village.json` (packaged), together with the import time. The file is gitignored.
-- It's a **snapshot**. Countdowns run from the export's timestamp, so anything you started or finished in-game after exporting isn't shown until you import again.
-- The export has no stored gold, elixir or dark elixir, so the app doesn't show resources.
-
-## Planner
-
-The planner is computed from the last village snapshot and `game-data.json`. It covers levels only, with no costs or times.
-- Your Town Hall level comes from the snapshot, not the API.
-- **Buildings and traps** use `buildings` in game-data.json, keyed by export ID. `caps` gives the max level per TH and `counts` gives how many you can build per TH. Every entry is `_todo: verify`.
-- **Heroes and Laboratory** reuse `caps.heroes`, `caps.troops`, `caps.spells` and `caps.siegeMachines`, matched through `ids.names`. Units listed for your TH but missing from the export appear as *not unlocked* and aren't counted.
-- Items with no cap for your TH are listed under "No cap data" and are never counted as maxed.
-- Category priority is set on the Planner page by dragging or with the arrows. It's saved to `data/planner.json` (gitignored). `planner.defaultOrder` in game-data.json is used until you reorder.
-- Builder Base isn't planned (there's no cap data for it).
-
-## Completion %
-
-Completion is calculated over home-village heroes, troops, spells and siege machines:
-
-```
-Σ min(level, TH cap) / Σ TH cap
+```powershell
+npm run typecheck
 ```
 
-Builder Base units, pets, super troops and hero equipment are left out. Builder Base data is still kept in memory for a later section.
+## Configuration & Game Data
 
-## Artwork
+Game caps and unit IDs are defined in [data/game-data.json](data/game-data.json):
+- Contains sparse step-maps defining the maximum level of each troop, hero, spell, and building per Town Hall level (`"TH": cap`).
+- Units or levels marked with `_todo` in the JSON are unverified entries that can be edited by hand.
+- In production builds, this file is copied to `%APPDATA%\com.imperator.app\data\game-data.json` on initial execution. Hand modifications take effect upon clicking the app's Refresh button.
 
-Every picture comes from `ImageSlot` (`src/components/ImageSlot.tsx`), in this order:
-1. **Your file in `art/`**: official unit, hero, spell and building art from Supercell's Fan Kit (fankit.supercell.com), which you download yourself. Files work with their original names (`Icon_HV_Hog_Rider.png`, `Building_HV_Cannon_level_12.png`); the mapping is in `src/lib/fanKit.ts`. You can also name files yourself (`hog-rider.png`). [art/README.md](art/README.md) has step-by-step download instructions.
-2. **Official images from the API**: clan badges (Clan, War, Dashboard) and league icons (Dashboard, Profile, member list). These load from `https://api-assets.clashofclans.com`, the only remote host the CSP allows for images. Rust also drops any image URL from the API that points elsewhere.
-3. **Otherwise**, a styled tile with a line icon. No emoji are used. This is also what you see when you're offline and an official image can't load.
+## Security Architecture
 
-Files are bundled at build time (`import.meta.glob`), so the app needs no filesystem permission and the CSP still only allows local images. In dev, a new file appears after a reload. For the installed app, rebuild. Images in `art/` are gitignored.
+Imperator adheres to strict security and least-privilege principles:
 
-## Security notes
+- **Isolated API Communication**: All external calls to `api.clashofclans.com` are performed in Rust via `reqwest` using `rustls`. The webview layer has zero access to the API token.
+- **Redacted Secret Handling**: The `ApiKey` struct in Rust intentionally lacks `Display` and implements a redacted `Debug` implementation to prevent tokens from leaking into logs or traces.
+- **Tauri Permissions**: Capabilities defined in [src-tauri/capabilities/default.json](src-tauri/capabilities/default.json) grant only window controls and opening `https://developer.clashofclans.com/*`. Filesystem, shell, and generic HTTP plugins are disabled.
+- **Content Security Policy (CSP)**: `img-src` is strictly limited to `'self' data: https://api-assets.clashofclans.com` (for official Supercell CDN clan and league badges). All other external network requests from the webview are blocked.
+- **In-Memory Caching**: API responses are cached in memory for 60 seconds to respect Supercell rate limits; manual refreshes bypass cache.
 
-- Capabilities (`src-tauri/capabilities/default.json`) cover only the window controls and opening `https://developer.clashofclans.com/*`. Nothing else: no shell, no fs, no http plugin.
-- The `ApiKey` type has a redacted `Debug` and no `Display`. `.env` parse errors are never passed through, because they can contain the raw line.
-- API responses are cached in memory for 60 s. Refresh skips the cache.
-- CSP `img-src` is `'self' data: https://api-assets.clashofclans.com`. Official badges and league icons are fetched by the webview straight from Supercell's CDN, with no referrer. They're the only requests the webview makes outside the app.
+## Contributing
 
-## Layout
+1. Fork the repository on GitHub.
+2. Create a feature branch (`git checkout -b feature/my-feature`).
+3. Verify TypeScript types:
+   ```powershell
+   npm run typecheck
+   ```
+4. Commit your changes and push to your branch (`git push origin feature/my-feature`).
+5. Open a Pull Request.
 
-```
-src-tauri/src/   commands/ api/ cache.rs config.rs errors.rs state.rs
-src/             components/ pages/ hooks/ lib/ types/
-data/            game-data.json (editable), cache/ (gitignored)
-```
+## License & Credits
+
+### License
+<!-- TODO: Add a LICENSE file (e.g. MIT, Apache-2.0, or proprietary) to the repository root. -->
+No license is currently specified in this repository. All rights reserved by the repository author until a formal license is added.
+
+### Supercell Fan Content Policy
+This material is unofficial and is not endorsed by Supercell. For more information see [Supercell's Fan Content Policy](https://supercell.com/en/fan-content-policy/).
