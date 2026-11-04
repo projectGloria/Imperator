@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* Design tokens → Tailwind utilities (bg-ink-900, text-gold-400, ...). */
+@theme {
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+
+  --color-ink-950: #070a15;
+  --color-ink-900: #0b1020;
+  --color-ink-800: #121830;
+  --color-ink-700: #1b2342;
+  --color-ink-600: #2a3358;
+
+  --color-gold-200: #fff3c4;
+  --color-gold-300: #ffe08a;
+  --color-gold-400: #f5c542;
+  --color-gold-500: #d99a1e;
+
+  --color-elixir-300: #f0abfc;
+  --color-elixir-400: #e879f9;
+  --color-elixir-500: #c04cff;
+  --color-elixir-700: #7e22ce;
+
+  --color-dark-300: #b39ddb;
+  --color-dark-500: #6d4c8f;
+  --color-dark-700: #3b2a4f;
+
+  --color-maxed-400: #34d399;
+  --color-danger-400: #f87171;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: #e7eaf6;
+  font-family: var(--font-sans);
+  background: var(--color-ink-900);
+  /* Desktop app, not a document: no text selection on chrome, no overscroll bounce. */
+  user-select: none;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layered backdrop: navy radial glow + faint gold/elixir haze + vignette. Pure CSS, no assets. */
+.app-backdrop {
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgb(245 197 66 / 0.08), transparent 60%),
+    radial-gradient(900px 700px at 110% 10%, rgb(192 76 255 / 0.10), transparent 60%),
+    radial-gradient(800px 600px at 50% 120%, rgb(109 76 143 / 0.18), transparent 60%),
+    linear-gradient(180deg, #0b1020 0%, #141826 100%);
+}
+
+/* Glass card base. The ::before adds a 1px top highlight like light catching an edge. */
+.glass {
+  position: relative;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.025));
+  border: 1px solid rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.6);
+}
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.10), transparent 30%);
+  mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+  mask-composite: exclude;
+  padding: 1px;
+}
+
+.text-gold-gradient {
+  background: linear-gradient(180deg, var(--color-gold-200), var(--color-gold-400) 55%, var(--color-gold-500));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Skeleton shimmer: one animated gradient, GPU-composited via background-position. */
+@keyframes shimmer {
+  from { background-position: -400px 0; }
+  to { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.04) 0%, rgb(255 255 255 / 0.10) 50%, rgb(255 255 255 / 0.04) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* Thin, dark scrollbars to match the theme (WebView2 = Chromium). */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 0.08); border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background-color: rgb(255 255 255 / 0.16); }
+::-webkit-scrollbar-track { background: transparent; }
+
+input, textarea { user-select: text; }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}

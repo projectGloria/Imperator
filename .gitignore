@@ -1,0 +1,13 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+data/cache/
+
+*.log
+.DS_Store

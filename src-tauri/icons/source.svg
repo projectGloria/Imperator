@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Placeholder app icon (original artwork): gold crown on a navy shield. Replace with your own. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#d99a1e"/></linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2342"/><stop offset="1" stop-color="#0b1020"/></linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#b)"/>
+  <path d="M116 340 L96 172 L188 248 L256 128 L324 248 L416 172 L396 340 Z" fill="url(#g)" stroke="#fff3c4" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="116" y="356" width="280" height="40" rx="14" fill="url(#g)"/>
+  <circle cx="256" cy="128" r="18" fill="#c04cff"/>
+</svg>

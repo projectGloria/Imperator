@@ -1,0 +1,32 @@
+[package]
+name = "imperator"
+version = "0.1.0"
+description = "Personal Clash of Clans companion"
+edition = "2021"
+publish = false
+
+[lib]
+# Tauri's convention: the app lives in a lib so main.rs stays a thin shim.
+name = "imperator_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+# rustls only: no OpenSSL / schannel dependency, deterministic TLS on Windows.
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["sync", "time"] }
+dotenvy = "0.15"
+thiserror = "2"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

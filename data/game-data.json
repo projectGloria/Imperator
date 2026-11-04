@@ -1,0 +1,79 @@
+{
+  "_note": "UNVERIFIED. Written from memory, not copied from any source. Every unit with a _todo needs checking against the in-game lab/hero hall at your TH. 'caps' is a sparse step map: key = Town Hall level, value = max level from that TH onward until the next key. Units missing here fall back to the API maxLevel and show as 'unknown cap' in the UI. Only maxTownHall and below were considered when writing this file.",
+  "version": 1,
+  "maxTownHall": 17,
+  "categories": {
+    "_todo": "Lists used to split the API's 'troops' array. Add new units here when Supercell releases them.",
+    "siegeMachines": ["Wall Wrecker", "Battle Blimp", "Stone Slammer", "Siege Barracks", "Log Launcher", "Flame Flinger", "Battle Drill", "Troop Launcher"],
+    "pets": ["L.A.S.S.I", "Electro Owl", "Mighty Yak", "Unicorn", "Frosty", "Diggy", "Poison Lizard", "Phoenix", "Spirit Fox", "Angry Jelly", "Sneezy"],
+    "superTroops": ["Super Barbarian", "Super Archer", "Super Giant", "Sneaky Goblin", "Super Wall Breaker", "Rocket Balloon", "Super Wizard", "Super Dragon", "Inferno Dragon", "Super Minion", "Super Valkyrie", "Super Witch", "Ice Hound", "Super Bowler", "Super Miner", "Super Hog Rider", "Super Yeti"]
+  },
+  "caps": {
+    "heroes": {
+      "Barbarian King": { "caps": { "7": 10, "8": 20, "9": 30, "10": 40, "11": 50, "12": 65, "13": 75, "14": 80, "15": 90, "16": 95, "17": 100 } },
+      "Archer Queen": { "caps": { "9": 30, "10": 40, "11": 50, "12": 65, "13": 75, "14": 80, "15": 90, "16": 95, "17": 100 } },
+      "Minion Prince": { "caps": { "9": 10, "10": 20, "11": 30, "12": 40, "13": 50, "14": 60, "15": 70, "16": 80, "17": 90 }, "_todo": "Newer hero; verify every step." },
+      "Grand Warden": { "caps": { "11": 20, "12": 40, "13": 50, "14": 55, "15": 65, "16": 70, "17": 75 } },
+      "Royal Champion": { "caps": { "13": 25, "14": 30, "15": 40, "16": 45, "17": 50 } }
+    },
+    "troops": {
+      "Barbarian": { "caps": { "1": 1, "3": 2, "5": 3, "6": 4, "7": 5, "8": 6, "9": 7, "10": 8, "11": 9, "12": 10, "13": 11, "15": 12 }, "_todo": "verify TH16-17" },
+      "Archer": { "caps": { "2": 1, "3": 2, "5": 3, "6": 4, "7": 5, "8": 6, "9": 7, "10": 8, "11": 9, "12": 10, "13": 11, "15": 12, "16": 13 }, "_todo": "verify" },
+      "Giant": { "caps": { "2": 1, "3": 2, "5": 3, "6": 4, "7": 5, "8": 6, "9": 7, "10": 8, "11": 9, "12": 10, "13": 11, "15": 12, "16": 13 }, "_todo": "verify" },
+      "Goblin": { "caps": { "2": 1, "3": 2, "5": 3, "6": 4, "7": 5, "8": 6, "10": 7, "11": 8, "13": 9 }, "_todo": "verify" },
+      "Wall Breaker": { "caps": { "3": 2, "5": 3, "6": 4, "7": 5, "8": 6, "10": 7, "11": 8, "12": 9, "13": 10, "14": 11, "16": 12, "17": 13 }, "_todo": "verify" },
+      "Balloon": { "caps": { "4": 2, "5": 3, "6": 4, "7": 5, "8": 6, "10": 7, "11": 8, "12": 9, "13": 10, "15": 11 }, "_todo": "verify" },
+      "Wizard": { "caps": { "5": 2, "6": 3, "7": 4, "8": 5, "9": 6, "10": 7, "11": 8, "12": 9, "13": 10, "14": 11, "15": 12 }, "_todo": "verify" },
+      "Healer": { "caps": { "6": 1, "7": 2, "8": 3, "9": 4, "11": 5, "13": 6, "14": 7, "15": 8, "16": 9 }, "_todo": "verify" },
+      "Dragon": { "caps": { "7": 2, "8": 3, "9": 4, "10": 5, "11": 6, "12": 7, "13": 8, "14": 9, "15": 10, "16": 11, "17": 12 }, "_todo": "verify" },
+      "P.E.K.K.A": { "caps": { "8": 3, "9": 4, "10": 6, "11": 7, "12": 8, "13": 9, "14": 10, "15": 11 }, "_todo": "verify" },
+      "Baby Dragon": { "caps": { "9": 2, "10": 4, "11": 5, "12": 6, "13": 7, "14": 8, "15": 9, "16": 10, "17": 11 }, "_todo": "verify" },
+      "Miner": { "caps": { "10": 3, "11": 5, "12": 6, "13": 7, "14": 8, "15": 9, "16": 10, "17": 11 }, "_todo": "verify" },
+      "Electro Dragon": { "caps": { "11": 2, "12": 3, "13": 4, "14": 5, "15": 6, "16": 7, "17": 8 }, "_todo": "verify" },
+      "Yeti": { "caps": { "12": 2, "13": 3, "14": 4, "15": 5, "16": 6 }, "_todo": "verify" },
+      "Dragon Rider": { "caps": { "13": 2, "14": 3, "15": 4, "16": 5 }, "_todo": "verify" },
+      "Electro Titan": { "caps": { "14": 2, "15": 3, "16": 4 }, "_todo": "verify" },
+      "Root Rider": { "caps": { "15": 2, "16": 3 }, "_todo": "verify" },
+      "Thrower": { "caps": { "16": 2, "17": 3 }, "_todo": "verify; unlock TH unsure" },
+      "Minion": { "caps": { "7": 2, "8": 4, "9": 5, "10": 6, "11": 7, "12": 8, "13": 9, "14": 10, "15": 11, "16": 12 }, "_todo": "verify" },
+      "Hog Rider": { "caps": { "7": 2, "8": 4, "9": 5, "10": 6, "11": 7, "12": 9, "13": 10, "14": 11, "15": 12, "16": 13 }, "_todo": "verify" },
+      "Valkyrie": { "caps": { "8": 2, "9": 4, "10": 5, "11": 6, "12": 7, "13": 8, "14": 9, "15": 10, "16": 11 }, "_todo": "verify" },
+      "Golem": { "caps": { "8": 2, "9": 4, "10": 5, "11": 7, "12": 9, "13": 10, "14": 11, "15": 12, "16": 13 }, "_todo": "verify" },
+      "Witch": { "caps": { "9": 2, "10": 3, "11": 4, "12": 5, "14": 6, "15": 7 }, "_todo": "verify" },
+      "Lava Hound": { "caps": { "9": 2, "10": 3, "11": 4, "12": 5, "13": 6 }, "_todo": "verify" },
+      "Bowler": { "caps": { "10": 2, "11": 3, "12": 4, "13": 5, "14": 6, "15": 7, "16": 8 }, "_todo": "verify" },
+      "Ice Golem": { "caps": { "11": 3, "12": 5, "13": 6, "14": 7, "15": 8 }, "_todo": "verify" },
+      "Headhunter": { "caps": { "12": 2, "13": 3 }, "_todo": "verify" },
+      "Apprentice Warden": { "caps": { "13": 2, "14": 3, "15": 4 }, "_todo": "verify" },
+      "Druid": { "caps": { "14": 2, "15": 3, "16": 4 }, "_todo": "verify; unlock TH unsure" },
+      "Furnace": { "caps": { "17": 2 }, "_todo": "verify; unlock TH unsure" }
+    },
+    "spells": {
+      "Lightning Spell": { "caps": { "5": 4, "8": 5, "9": 6, "10": 7, "12": 8, "13": 9, "15": 10, "16": 11, "17": 12 }, "_todo": "verify" },
+      "Healing Spell": { "caps": { "6": 3, "7": 4, "8": 5, "9": 6, "10": 7, "13": 8, "14": 9, "15": 10, "16": 11 }, "_todo": "verify" },
+      "Rage Spell": { "caps": { "7": 4, "8": 5, "11": 6 }, "_todo": "verify" },
+      "Jump Spell": { "caps": { "9": 2, "10": 3, "12": 4, "14": 5 }, "_todo": "verify" },
+      "Freeze Spell": { "caps": { "9": 2, "10": 5, "11": 6, "12": 7 }, "_todo": "verify" },
+      "Clone Spell": { "caps": { "10": 3, "11": 5, "12": 6, "13": 7, "15": 8 }, "_todo": "verify" },
+      "Invisibility Spell": { "caps": { "11": 1, "12": 2, "13": 3, "14": 4 }, "_todo": "verify" },
+      "Recall Spell": { "caps": { "13": 2, "14": 3, "15": 4, "16": 5 }, "_todo": "verify" },
+      "Revive Spell": { "caps": { "16": 2, "17": 3 }, "_todo": "verify; unlock TH unsure" },
+      "Poison Spell": { "caps": { "8": 2, "9": 3, "10": 4, "11": 5, "12": 6, "13": 7, "14": 8, "15": 9, "16": 10 }, "_todo": "verify" },
+      "Earthquake Spell": { "caps": { "8": 2, "9": 3, "10": 4, "11": 5 }, "_todo": "verify" },
+      "Haste Spell": { "caps": { "9": 2, "10": 4, "11": 5 }, "_todo": "verify" },
+      "Skeleton Spell": { "caps": { "9": 1, "10": 3, "11": 4, "12": 5, "13": 6, "14": 7, "15": 8 }, "_todo": "verify" },
+      "Bat Spell": { "caps": { "10": 3, "11": 4, "12": 5, "15": 6 }, "_todo": "verify" },
+      "Overgrowth Spell": { "caps": { "15": 2, "16": 3 }, "_todo": "verify" }
+    },
+    "siegeMachines": {
+      "Wall Wrecker": { "caps": { "12": 3, "13": 4, "15": 5 }, "_todo": "verify" },
+      "Battle Blimp": { "caps": { "12": 3, "13": 4 }, "_todo": "verify" },
+      "Stone Slammer": { "caps": { "12": 3, "13": 4, "15": 5 }, "_todo": "verify" },
+      "Siege Barracks": { "caps": { "13": 4, "15": 5 }, "_todo": "verify" },
+      "Log Launcher": { "caps": { "13": 4, "15": 5 }, "_todo": "verify" },
+      "Flame Flinger": { "caps": { "14": 4, "15": 5 }, "_todo": "verify" },
+      "Battle Drill": { "caps": { "15": 4, "16": 5 }, "_todo": "verify" },
+      "Troop Launcher": { "caps": { "17": 2 }, "_todo": "verify; unlock TH unsure" }
+    }
+  }
+}
