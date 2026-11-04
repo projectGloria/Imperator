@@ -89,3 +89,74 @@ pub struct Cached<T> {
     pub fetched_at: u64,
     pub from_cache: bool,
 }
+
+/// GET /clans/{tag}. Badge URLs are deliberately not modelled (Supercell art).
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Clan {
+    pub tag: String,
+    pub name: String,
+    /// "open" | "inviteOnly" | "closed"
+    #[serde(rename = "type", default)]
+    pub kind: String,
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
+    pub location: Option<Named>,
+    #[serde(default)]
+    pub chat_language: Option<Named>,
+    pub clan_level: u32,
+    #[serde(default)]
+    pub clan_points: u32,
+    #[serde(default)]
+    pub clan_capital_points: Option<u32>,
+    #[serde(default)]
+    pub required_trophies: u32,
+    #[serde(default)]
+    pub required_townhall_level: Option<u32>,
+    #[serde(default)]
+    pub war_frequency: Option<String>,
+    #[serde(default)]
+    pub war_win_streak: u32,
+    #[serde(default)]
+    pub war_wins: u32,
+    /// Only present when the war log is public.
+    #[serde(default)]
+    pub war_ties: Option<u32>,
+    #[serde(default)]
+    pub war_losses: Option<u32>,
+    #[serde(default)]
+    pub is_war_log_public: bool,
+    #[serde(default)]
+    pub war_league: Option<Named>,
+    #[serde(default)]
+    pub capital_league: Option<Named>,
+    /// Member count (0..=50).
+    pub members: u32,
+    #[serde(default)]
+    pub member_list: Vec<ClanMember>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ClanMember {
+    pub tag: String,
+    pub name: String,
+    /// "leader" | "coLeader" | "admin" (Elder) | "member"
+    pub role: String,
+    #[serde(default)]
+    pub town_hall_level: Option<u32>,
+    pub exp_level: u32,
+    #[serde(default)]
+    pub league: Option<Named>,
+    #[serde(default)]
+    pub league_tier: Option<Named>,
+    pub trophies: u32,
+    #[serde(default)]
+    pub builder_base_trophies: Option<u32>,
+    pub clan_rank: u32,
+    #[serde(default)]
+    pub previous_clan_rank: u32,
+    pub donations: u32,
+    pub donations_received: u32,
+}

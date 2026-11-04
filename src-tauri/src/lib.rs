@@ -18,6 +18,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::player::get_player,
+            commands::clan::get_clan,
             commands::setup::get_config_status,
             commands::setup::save_config,
             commands::game_data::get_game_data,

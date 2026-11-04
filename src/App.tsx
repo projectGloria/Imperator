@@ -8,6 +8,8 @@ import { DashboardSkeleton, GridSkeleton } from "./components/Skeleton";
 import { Dashboard } from "./pages/Dashboard";
 import { Profile } from "./pages/Profile";
 import { Setup } from "./pages/Setup";
+import { ClanPage } from "./pages/Clan";
+import { Users } from "lucide-react";
 import { useGameData, usePlayer } from "./hooks/usePlayer";
 import { useResource } from "./hooks/useResource";
 import { api } from "./lib/api";
@@ -34,7 +36,21 @@ export default function App() {
   );
 }
 
-const TITLES: Partial<Record<PageId, string>> = { dashboard: "Dashboard", profile: "Profile" };
+const TITLES: Record<PageId, string> = {
+  dashboard: "Dashboard", profile: "Profile", clan: "Clan", war: "War", village: "Village", planner: "Planner",
+};
+
+function NoClan() {
+  return (
+    <div className="glass mx-auto mt-16 max-w-md rounded-3xl p-8 text-center">
+      <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-white/5 text-white/60">
+        <Users size={26} />
+      </div>
+      <h2 className="mt-4 font-display text-xl font-bold">You're not in a clan</h2>
+      <p className="mt-1 text-sm text-white/60">Join a clan in-game, then hit Refresh.</p>
+    </div>
+  );
+}
 
 /** Mounted only once config exists, so the player fetch never fires unconfigured. */
 function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
@@ -58,20 +74,12 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
   const err = player.error;
   // invalidIp / notConfigured always get the full screen — they need action, not a banner.
   const blocking = err && (!p || err.kind === "invalidIp" || err.kind === "notConfigured");
+  const ownsRefresh = page === "clan" && !!p?.clan;
 
   return (
     <div className="flex h-full">
       <Sidebar active={page} onNavigate={setPage} />
       <main className="min-w-0 flex-1 overflow-y-auto px-8 py-7">
-        <RefreshBar
-          title={TITLES[page] ?? ""}
-          subtitle={p ? `${p.name} · ${p.tag}` : undefined}
-          fetchedAt={player.data?.fetchedAt}
-          fromCache={player.data?.fromCache}
-          refreshing={player.refreshing}
-          onRefresh={refresh}
-        />
-
         {gameData.error && (
           <ErrorBanner
             error={gameData.error}
@@ -90,10 +98,25 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
+            {/* Clan (and later War) own their resource + RefreshBar; everything else
+                refreshes the player. While the player is loading/failed, the clan tag
+                isn't known yet, so those pages fall back to the player bar too. */}
+            {!(ownsRefresh && p && !blocking) && (
+              <RefreshBar
+                title={TITLES[page]}
+                subtitle={p ? `${p.name} · ${p.tag}` : undefined}
+                fetchedAt={player.data?.fetchedAt}
+                fromCache={player.data?.fromCache}
+                refreshing={player.refreshing}
+                onRefresh={refresh}
+              />
+            )}
             {blocking ? (
               <ErrorScreen error={err} onRetry={err.kind === "notConfigured" ? onNeedsSetup : player.retry} />
             ) : !p || !roster ? (
-              page === "dashboard" ? <DashboardSkeleton /> : <GridSkeleton />
+              page === "profile" ? <GridSkeleton /> : <DashboardSkeleton />
+            ) : page === "clan" ? (
+              p.clan ? <ClanPage clanTag={p.clan.tag} myTag={p.tag} /> : <NoClan />
             ) : page === "dashboard" ? (
               <Dashboard player={p} roster={roster} gameData={gameData.data} />
             ) : (

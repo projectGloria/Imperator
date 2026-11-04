@@ -14,7 +14,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "profile", label: "Profile", icon: User },
-  { id: "clan", label: "Clan", icon: Users, soon: true },
+  { id: "clan", label: "Clan", icon: Users },
   { id: "war", label: "War", icon: Swords, soon: true },
   { id: "village", label: "Village", icon: Castle, soon: true },
   { id: "planner", label: "Planner", icon: ListOrdered, soon: true },
