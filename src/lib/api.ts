@@ -5,6 +5,7 @@ import type { AppError } from "../types/errors";
 import type { Cached, Player } from "../types/player";
 import type { ConfigStatus, GameData } from "../types/gameData";
 import type { Clan } from "../types/clan";
+import type { War } from "../types/war";
 
 /** Narrow whatever `invoke` rejected with into our AppError union. */
 export function toAppError(e: unknown): AppError {
@@ -27,6 +28,8 @@ async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> 
 export const api = {
   getPlayer: (forceRefresh = false) => call<Cached<Player>>("get_player", { forceRefresh }),
   getClan: (clanTag: string, forceRefresh = false) => call<Cached<Clan>>("get_clan", { clanTag, forceRefresh }),
+  getCurrentWar: (clanTag: string, forceRefresh = false) =>
+    call<Cached<War>>("get_current_war", { clanTag, forceRefresh }),
   getConfigStatus: () => call<ConfigStatus>("get_config_status"),
   saveConfig: (apiKey: string, playerTag: string) => call<string>("save_config", { apiKey, playerTag }),
   getGameData: () => call<GameData>("get_game_data"),

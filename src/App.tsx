@@ -9,6 +9,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Profile } from "./pages/Profile";
 import { Setup } from "./pages/Setup";
 import { ClanPage } from "./pages/Clan";
+import { WarPage } from "./pages/War";
 import { Users } from "lucide-react";
 import { useGameData, usePlayer } from "./hooks/usePlayer";
 import { useResource } from "./hooks/useResource";
@@ -74,7 +75,8 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
   const err = player.error;
   // invalidIp / notConfigured always get the full screen — they need action, not a banner.
   const blocking = err && (!p || err.kind === "invalidIp" || err.kind === "notConfigured");
-  const ownsRefresh = page === "clan" && !!p?.clan;
+  // Clan + War fetch per clan tag and own their RefreshBar (only once a clan exists).
+  const ownsRefresh = (page === "clan" || page === "war") && !!p?.clan;
 
   return (
     <div className="flex h-full">
@@ -98,7 +100,7 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            {/* Clan (and later War) own their resource + RefreshBar; everything else
+            {/* Clan and War own their resource + RefreshBar; everything else
                 refreshes the player. While the player is loading/failed, the clan tag
                 isn't known yet, so those pages fall back to the player bar too. */}
             {!(ownsRefresh && p && !blocking) && (
@@ -117,6 +119,8 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
               page === "profile" ? <GridSkeleton /> : <DashboardSkeleton />
             ) : page === "clan" ? (
               p.clan ? <ClanPage clanTag={p.clan.tag} myTag={p.tag} /> : <NoClan />
+            ) : page === "war" ? (
+              p.clan ? <WarPage clanTag={p.clan.tag} myTag={p.tag} /> : <NoClan />
             ) : page === "dashboard" ? (
               <Dashboard player={p} roster={roster} gameData={gameData.data} />
             ) : (

@@ -160,3 +160,84 @@ pub struct ClanMember {
     pub donations: u32,
     pub donations_received: u32,
 }
+
+/// GET /clans/{tag}/currentwar. `clan` is always the clan we asked about.
+///
+/// Almost everything is optional: a `notInWar` response carries only `state` plus
+/// zeroed stubs, and we synthesise `{"state":"warLogPrivate"}` for the 403 case
+/// (see commands/war.rs), so the struct must deserialise from just `state`.
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct War {
+    /// "notInWar" | "preparation" | "inWar" | "warEnded" | "warLogPrivate" (ours).
+    pub state: String,
+    #[serde(default)]
+    pub team_size: u32,
+    /// Missing on some older responses; the UI defaults it to 2.
+    #[serde(default)]
+    pub attacks_per_member: Option<u32>,
+    /// Timestamps stay in Supercell's compact form ("20250114T183012.000Z");
+    /// parsed once in the UI rather than pulling in chrono for three fields.
+    #[serde(default)]
+    pub preparation_start_time: Option<String>,
+    #[serde(default)]
+    pub start_time: Option<String>,
+    #[serde(default)]
+    pub end_time: Option<String>,
+    #[serde(default)]
+    pub clan: Option<WarClan>,
+    #[serde(default)]
+    pub opponent: Option<WarClan>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WarClan {
+    #[serde(default)]
+    pub tag: Option<String>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub clan_level: u32,
+    #[serde(default)]
+    pub attacks: u32,
+    #[serde(default)]
+    pub stars: u32,
+    #[serde(default)]
+    pub destruction_percentage: f64,
+    #[serde(default)]
+    pub members: Vec<WarMember>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WarMember {
+    pub tag: String,
+    pub name: String,
+    /// Note the API's lowercase "h" here (`townhallLevel`), unlike `/players`.
+    #[serde(default)]
+    pub townhall_level: u32,
+    #[serde(default)]
+    pub map_position: u32,
+    /// Absent until the member has attacked.
+    #[serde(default)]
+    pub attacks: Vec<WarAttack>,
+    #[serde(default)]
+    pub opponent_attacks: u32,
+    #[serde(default)]
+    pub best_opponent_attack: Option<WarAttack>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WarAttack {
+    pub attacker_tag: String,
+    pub defender_tag: String,
+    pub stars: u32,
+    #[serde(default)]
+    pub destruction_percentage: f64,
+    #[serde(default)]
+    pub order: u32,
+    #[serde(default)]
+    pub duration: Option<u32>,
+}
