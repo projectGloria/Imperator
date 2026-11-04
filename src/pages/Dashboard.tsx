@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { Castle, Hourglass, Medal, Shield, Star, Trophy } from "lucide-react";
+import { Castle, Medal, Shield, Star, Trophy } from "lucide-react";
 import type { Player } from "../types/player";
 import type { GameData } from "../types/gameData";
+import type { VillageSnapshot } from "../types/village";
+import { ActiveUpgradesCard } from "./Village";
 import { CATEGORIES, CATEGORY_LABEL, completion, type Roster } from "../lib/units";
 import { fmtNum, roleLabel } from "../lib/format";
 import { GlassCard } from "../components/GlassCard";
@@ -12,7 +14,15 @@ import { ImageSlot } from "../components/ImageSlot";
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
 const RING_TONE = { heroes: "dark", troops: "elixir", spells: "elixir", siegeMachines: "gold" } as const;
 
-export function Dashboard({ player, roster, gameData }: { player: Player; roster: Roster; gameData: GameData | null }) {
+export function Dashboard({
+  player, roster, gameData, village, onOpenVillage,
+}: {
+  player: Player;
+  roster: Roster;
+  gameData: GameData | null;
+  village: VillageSnapshot | null;
+  onOpenVillage: () => void;
+}) {
   // All derived from props each render — no useState/useEffect mirror to go stale.
   const all = CATEGORIES.flatMap((c) => roster[c]);
   const overall = completion(all);
@@ -87,17 +97,7 @@ export function Dashboard({ player, roster, gameData }: { player: Player; roster
           </div>
         </GlassCard>
 
-        <GlassCard lift={false} className="p-6">
-          <h2 className="font-display text-lg font-semibold">Active upgrades</h2>
-          <div className="mt-6 flex flex-col items-center gap-3 text-center">
-            <div className="grid size-14 place-items-center rounded-2xl bg-elixir-500/10 text-elixir-300">
-              <Hourglass size={26} />
-            </div>
-            <p className="text-sm text-white/60">
-              The API doesn't expose upgrade timers. Live countdowns appear here once you import your village data (step 4).
-            </p>
-          </div>
-        </GlassCard>
+        <ActiveUpgradesCard snap={village} gameData={gameData} onOpenVillage={onOpenVillage} />
       </div>
     </motion.div>
   );

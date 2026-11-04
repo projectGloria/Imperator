@@ -6,6 +6,7 @@ import type { Cached, Player } from "../types/player";
 import type { ConfigStatus, GameData } from "../types/gameData";
 import type { Clan } from "../types/clan";
 import type { War } from "../types/war";
+import type { VillageSnapshot } from "../types/village";
 
 /** Narrow whatever `invoke` rejected with into our AppError union. */
 export function toAppError(e: unknown): AppError {
@@ -33,5 +34,8 @@ export const api = {
   getConfigStatus: () => call<ConfigStatus>("get_config_status"),
   saveConfig: (apiKey: string, playerTag: string) => call<string>("save_config", { apiKey, playerTag }),
   getGameData: () => call<GameData>("get_game_data"),
+  /** null = nothing imported yet. */
+  getVillage: () => call<VillageSnapshot | null>("get_village"),
+  importVillage: (json: string) => call<VillageSnapshot>("import_village", { json }),
   getPublicIp: () => call<string>("get_public_ip"),
 };

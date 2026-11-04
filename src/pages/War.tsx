@@ -4,7 +4,8 @@ import { Lock, Shield, ShieldHalf, Star, Swords, Timer, type LucideIcon } from "
 import type { War, WarMember } from "../types/war";
 import { useWar } from "../hooks/useWar";
 import { useNow } from "../hooks/useNow";
-import { fmtCountdown, outcome, parseApiTime, PHASE_LABEL, side, type Outcome, type Side } from "../lib/war";
+import { outcome, parseApiTime, PHASE_LABEL, side, type Outcome, type Side } from "../lib/war";
+import { fmtCountdown } from "../lib/format";
 import { GlassCard } from "../components/GlassCard";
 import { ImageSlot } from "../components/ImageSlot";
 import { ProgressBar } from "../components/ProgressBar";

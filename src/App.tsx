@@ -10,8 +10,9 @@ import { Profile } from "./pages/Profile";
 import { Setup } from "./pages/Setup";
 import { ClanPage } from "./pages/Clan";
 import { WarPage } from "./pages/War";
+import { VillagePage } from "./pages/Village";
 import { Users } from "lucide-react";
-import { useGameData, usePlayer } from "./hooks/usePlayer";
+import { useGameData, usePlayer, useVillage } from "./hooks/usePlayer";
 import { useResource } from "./hooks/useResource";
 import { api } from "./lib/api";
 import { buildRoster } from "./lib/units";
@@ -58,6 +59,9 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
   const [page, setPage] = useState<PageId>("dashboard");
   const player = usePlayer();
   const gameData = useGameData();
+  // Lives at Shell level: Dashboard and Village both read it, and an import on the
+  // Village page refreshes this one resource so both update together.
+  const village = useVillage();
 
   // Memo keyed on the two data objects: these only change identity on a real fetch,
   // so page switches and the 1s freshness tick don't rebuild the roster.
@@ -76,7 +80,8 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
   // invalidIp / notConfigured always get the full screen — they need action, not a banner.
   const blocking = err && (!p || err.kind === "invalidIp" || err.kind === "notConfigured");
   // Clan + War fetch per clan tag and own their RefreshBar (only once a clan exists).
-  const ownsRefresh = (page === "clan" || page === "war") && !!p?.clan;
+  // Village has no API data, so it renders its own header without a Refresh button.
+  const ownsRefresh = ((page === "clan" || page === "war") && !!p?.clan) || page === "village";
 
   return (
     <div className="flex h-full">
@@ -100,7 +105,7 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            {/* Clan and War own their resource + RefreshBar; everything else
+            {/* Clan, War and Village own their resource + RefreshBar; everything else
                 refreshes the player. While the player is loading/failed, the clan tag
                 isn't known yet, so those pages fall back to the player bar too. */}
             {!(ownsRefresh && p && !blocking) && (
@@ -121,8 +126,16 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
               p.clan ? <ClanPage clanTag={p.clan.tag} myTag={p.tag} /> : <NoClan />
             ) : page === "war" ? (
               p.clan ? <WarPage clanTag={p.clan.tag} myTag={p.tag} /> : <NoClan />
+            ) : page === "village" ? (
+              <VillagePage village={village} gameData={gameData.data} playerTag={p.tag} />
             ) : page === "dashboard" ? (
-              <Dashboard player={p} roster={roster} gameData={gameData.data} />
+              <Dashboard
+                player={p}
+                roster={roster}
+                gameData={gameData.data}
+                village={village.data}
+                onOpenVillage={() => setPage("village")}
+              />
             ) : (
               <Profile player={p} roster={roster} />
             )}

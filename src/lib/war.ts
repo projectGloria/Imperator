@@ -15,18 +15,6 @@ export function parseApiTime(s?: string | null): number | null {
   return Number.isNaN(t) ? null : t;
 }
 
-/** "3h 04m 09s" / "12m 05s" / "45s". */
-export function fmtCountdown(ms: number): string {
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  const p = (n: number) => String(n).padStart(2, "0");
-  if (h > 0) return `${h}h ${p(m)}m ${p(s)}s`;
-  if (m > 0) return `${m}m ${p(s)}s`;
-  return `${s}s`;
-}
-
 export const PHASE_LABEL: Record<string, string> = {
   preparation: "Preparation day",
   inWar: "Battle day",

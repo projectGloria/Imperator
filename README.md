@@ -62,6 +62,14 @@ The packaged app does **not** contain your `.env`. On first launch it shows a se
 - If your level is above the listed cap, the card is flagged **check cap data**.
 - If a unit is listed for your TH but the API doesn't return it, it shows as *Not unlocked* and counts as level 0.
 - Packaged builds copy the file to `%APPDATA%\com.imperator.app\data\` on first run. Edit that copy.
+- `ids` maps the numeric IDs in the village export to names. IDs listed in `ids.unverified` are guesses and show a **?** badge. IDs with no name show as *Unknown #id*. Add them as you identify them.
+
+## Village import
+
+The API has no upgrade timers. They come from the game's own village export JSON, pasted on the Village page.
+- The paste is validated in Rust and saved as `data/village.json` (dev) or `%APPDATA%\com.imperator.app\data\village.json` (packaged), together with the import time. The file is gitignored.
+- It's a **snapshot**. Countdowns run from the export's timestamp, so anything you started or finished in-game after exporting isn't shown until you import again.
+- The export has no stored gold, elixir or dark elixir, so the app doesn't show resources.
 
 ## Completion %
 

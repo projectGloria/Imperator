@@ -21,6 +21,21 @@ pub struct GameData {
     pub max_town_hall: u32,
     pub categories: Categories,
     pub caps: Caps,
+    /// Numeric export IDs → names, for the village import. Optional so an older
+    /// game-data.json without it still loads (imports then show "Unknown #id").
+    #[serde(default)]
+    pub ids: Ids,
+}
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Ids {
+    /// Keyed by the stringified ID (JSON object keys must be strings).
+    #[serde(default)]
+    pub names: HashMap<String, String>,
+    /// IDs whose name is a guess; the UI marks them so you know what to check.
+    #[serde(default)]
+    pub unverified: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -51,29 +66,37 @@ pub struct UnitCaps {
     pub todo: Option<String>,
 }
 
-fn data_file(app: &AppHandle) -> AppResult<PathBuf> {
+/// Folder for editable local data (game-data.json, village.json).
+/// Debug: `<project root>/data`. Release: `%APPDATA%\com.imperator.app\data`
+/// (app_data_dir), created on demand.
+pub(crate) fn data_dir(app: &AppHandle) -> AppResult<PathBuf> {
     #[cfg(debug_assertions)]
     {
         let _ = app;
-        Ok(crate::config::project_root().join("data").join(FILE))
+        Ok(crate::config::project_root().join("data"))
     }
     #[cfg(not(debug_assertions))]
     {
-        // Packaged: keep an editable copy in app data, seeded from the bundled resource once.
         let dir = app.path().app_data_dir().map_err(|_| AppError::io("No app data dir."))?.join("data");
-        let target = dir.join(FILE);
-        if !target.exists() {
-            let bundled = app
-                .path()
-                .resource_dir()
-                .map_err(|_| AppError::io("No resource dir."))?
-                .join("data")
-                .join(FILE);
-            std::fs::create_dir_all(&dir)?;
-            std::fs::copy(bundled, &target)?;
-        }
-        Ok(target)
+        std::fs::create_dir_all(&dir)?;
+        Ok(dir)
     }
+}
+
+fn data_file(app: &AppHandle) -> AppResult<PathBuf> {
+    let target = data_dir(app)?.join(FILE);
+    // Packaged: seed the editable copy from the bundled resource once.
+    #[cfg(not(debug_assertions))]
+    if !target.exists() {
+        let bundled = app
+            .path()
+            .resource_dir()
+            .map_err(|_| AppError::io("No resource dir."))?
+            .join("data")
+            .join(FILE);
+        std::fs::copy(bundled, &target)?;
+    }
+    Ok(target)
 }
 
 #[tauri::command]

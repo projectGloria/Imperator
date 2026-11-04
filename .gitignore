@@ -8,6 +8,8 @@ dist/
 src-tauri/target/
 src-tauri/gen/
 data/cache/
+data/village.json
+data/village.json.tmp
 
 *.log
 .DS_Store

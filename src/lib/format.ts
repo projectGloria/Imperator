@@ -11,7 +11,9 @@ export function ago(fromMs: number, nowMs: number): string {
   if (s < 60) return `${s}s ago`;
   const m = Math.floor(s / 60);
   if (m < 60) return `${m}m ago`;
-  return `${Math.floor(m / 60)}h ago`;
+  const h = Math.floor(m / 60);
+  if (h < 48) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`; // village snapshots can be days old
 }
 
 /** API role ids → in-game labels ("admin" is the API's legacy name for Elder). */
@@ -23,4 +25,18 @@ export function roleLabel(role?: string | null): string {
     case "member": return "Member";
     default: return "—";
   }
+}
+
+/** Countdown: "2d 03h 14m" / "3h 04m 09s" / "12m 05s" / "45s". Seconds dropped past a day. */
+export function fmtCountdown(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const d = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const p = (n: number) => String(n).padStart(2, "0");
+  if (d > 0) return `${d}d ${p(h)}h ${p(m)}m`;
+  if (h > 0) return `${h}h ${p(m)}m ${p(s)}s`;
+  if (m > 0) return `${m}m ${p(s)}s`;
+  return `${s}s`;
 }
