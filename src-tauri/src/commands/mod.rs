@@ -1,6 +1,7 @@
 pub mod clan;
 pub mod game_data;
 pub mod net;
+pub mod planner;
 pub mod player;
 pub mod setup;
 pub mod village;

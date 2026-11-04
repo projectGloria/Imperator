@@ -11,6 +11,7 @@ import { Setup } from "./pages/Setup";
 import { ClanPage } from "./pages/Clan";
 import { WarPage } from "./pages/War";
 import { VillagePage } from "./pages/Village";
+import { PlannerPage } from "./pages/Planner";
 import { Users } from "lucide-react";
 import { useGameData, usePlayer, useVillage } from "./hooks/usePlayer";
 import { useResource } from "./hooks/useResource";
@@ -80,8 +81,8 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
   // invalidIp / notConfigured always get the full screen — they need action, not a banner.
   const blocking = err && (!p || err.kind === "invalidIp" || err.kind === "notConfigured");
   // Clan + War fetch per clan tag and own their RefreshBar (only once a clan exists).
-  // Village has no API data, so it renders its own header without a Refresh button.
-  const ownsRefresh = ((page === "clan" || page === "war") && !!p?.clan) || page === "village";
+  // Village + Planner have no API data, so they render their own header without Refresh.
+  const ownsRefresh = ((page === "clan" || page === "war") && !!p?.clan) || page === "village" || page === "planner";
 
   return (
     <div className="flex h-full">
@@ -105,7 +106,7 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            {/* Clan, War and Village own their resource + RefreshBar; everything else
+            {/* Clan, War, Village and Planner own their resource + RefreshBar; everything else
                 refreshes the player. While the player is loading/failed, the clan tag
                 isn't known yet, so those pages fall back to the player bar too. */}
             {!(ownsRefresh && p && !blocking) && (
@@ -128,6 +129,8 @@ function Shell({ onNeedsSetup }: { onNeedsSetup: () => void }) {
               p.clan ? <WarPage clanTag={p.clan.tag} myTag={p.tag} /> : <NoClan />
             ) : page === "village" ? (
               <VillagePage village={village} gameData={gameData.data} playerTag={p.tag} />
+            ) : page === "planner" ? (
+              <PlannerPage snap={village.data} gameData={gameData.data} onOpenVillage={() => setPage("village")} />
             ) : page === "dashboard" ? (
               <Dashboard
                 player={p}

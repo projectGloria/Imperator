@@ -25,6 +25,40 @@ pub struct GameData {
     /// game-data.json without it still loads (imports then show "Unknown #id").
     #[serde(default)]
     pub ids: Ids,
+    /// Building/trap caps for the planner, keyed by export ID. Optional like `ids`.
+    #[serde(default)]
+    pub buildings: HashMap<String, BuildingCaps>,
+    #[serde(default)]
+    pub planner: PlannerData,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BuildingCaps {
+    /// Planner category id (must match one in `planner.categories`).
+    pub category: String,
+    /// TH → max level, sparse step map (same convention as unit caps).
+    pub caps: BTreeMap<String, u32>,
+    /// TH → how many can be built. Absent = we don't know, so no "not built" rows.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub counts: Option<BTreeMap<String, u32>>,
+    #[serde(default, rename = "_todo", skip_serializing_if = "Option::is_none")]
+    pub todo: Option<String>,
+}
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlannerData {
+    #[serde(default)]
+    pub categories: Vec<PlannerCategory>,
+    #[serde(default)]
+    pub default_order: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PlannerCategory {
+    pub id: String,
+    pub label: String,
 }
 
 #[derive(Debug, Default, Deserialize, Serialize)]
@@ -105,4 +139,24 @@ pub async fn get_game_data(app: AppHandle) -> AppResult<GameData> {
     let text = std::fs::read_to_string(&path)
         .map_err(|e| AppError::io(format!("{}: {e}", path.display())))?;
     serde_json::from_str(&text).map_err(|e| AppError::parse(format!("{FILE}: {e}")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The shipped file must parse with the typed schema: a stray `_note` string inside a
+    /// typed map, or a misspelt key, would otherwise only surface as a runtime banner.
+    #[test]
+    fn shipped_game_data_parses() {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../data").join(FILE);
+        let gd: GameData = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+        let cats: Vec<&str> = gd.planner.categories.iter().map(|c| c.id.as_str()).collect();
+        for b in gd.buildings.values() {
+            assert!(cats.contains(&b.category.as_str()), "unknown category {}", b.category);
+        }
+        for id in gd.buildings.keys() {
+            assert!(gd.ids.names.contains_key(id), "building {id} has caps but no name");
+        }
+    }
 }

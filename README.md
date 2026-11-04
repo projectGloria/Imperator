@@ -71,6 +71,16 @@ The API has no upgrade timers. They come from the game's own village export JSON
 - It's a **snapshot**. Countdowns run from the export's timestamp, so anything you started or finished in-game after exporting isn't shown until you import again.
 - The export has no stored gold, elixir or dark elixir, so the app doesn't show resources.
 
+## Planner
+
+The planner is computed from the last village snapshot and `game-data.json`. It covers levels only, with no costs or times.
+- Your Town Hall level comes from the snapshot, not the API.
+- **Buildings and traps** use `buildings` in game-data.json, keyed by export ID. `caps` gives the max level per TH and `counts` gives how many you can build per TH. Every entry is `_todo: verify`.
+- **Heroes and Laboratory** reuse `caps.heroes`, `caps.troops`, `caps.spells` and `caps.siegeMachines`, matched through `ids.names`. Units listed for your TH but missing from the export appear as *not unlocked* and aren't counted.
+- Items with no cap for your TH are listed under "No cap data" and are never counted as maxed.
+- Category priority is set on the Planner page by dragging or with the arrows. It's saved to `data/planner.json` (gitignored). `planner.defaultOrder` in game-data.json is used until you reorder.
+- Builder Base isn't planned (there's no cap data for it).
+
 ## Completion %
 
 Completion is calculated over home-village heroes, troops, spells and siege machines:

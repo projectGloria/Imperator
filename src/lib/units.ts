@@ -22,7 +22,8 @@ export interface UnitView {
 }
 
 /** Step-map lookup: value at the largest TH key ≤ th. */
-export function capAt(entry: UnitCaps | undefined, th: number): number | undefined {
+// Structural param type so building caps/counts (same step-map shape) can reuse it.
+export function capAt(entry: Pick<UnitCaps, "caps"> | undefined, th: number): number | undefined {
   if (!entry) return undefined;
   let best: number | undefined;
   let bestTh = -1;

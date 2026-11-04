@@ -10,6 +10,8 @@ src-tauri/gen/
 data/cache/
 data/village.json
 data/village.json.tmp
+data/planner.json
+data/planner.json.tmp
 
 *.log
 .DS_Store

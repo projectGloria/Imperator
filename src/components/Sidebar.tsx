@@ -17,7 +17,7 @@ const NAV: NavItem[] = [
   { id: "clan", label: "Clan", icon: Users },
   { id: "war", label: "War", icon: Swords },
   { id: "village", label: "Village", icon: Castle },
-  { id: "planner", label: "Planner", icon: ListOrdered, soon: true },
+  { id: "planner", label: "Planner", icon: ListOrdered },
 ];
 
 export function Sidebar({ active, onNavigate }: { active: PageId; onNavigate: (p: PageId) => void }) {

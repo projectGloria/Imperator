@@ -37,5 +37,7 @@ export const api = {
   /** null = nothing imported yet. */
   getVillage: () => call<VillageSnapshot | null>("get_village"),
   importVillage: (json: string) => call<VillageSnapshot>("import_village", { json }),
+  getPlannerPrefs: () => call<{ order: string[] }>("get_planner_prefs"),
+  savePlannerPrefs: (order: string[]) => call<void>("save_planner_prefs", { order }),
   getPublicIp: () => call<string>("get_public_ip"),
 };

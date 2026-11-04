@@ -25,6 +25,8 @@ pub fn run() {
             commands::game_data::get_game_data,
             commands::village::import_village,
             commands::village::get_village,
+            commands::planner::get_planner_prefs,
+            commands::planner::save_planner_prefs,
             commands::net::get_public_ip,
         ])
         .run(tauri::generate_context!())
