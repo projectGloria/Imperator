@@ -1,6 +1,6 @@
 id = "Imperator"
 name = "Imperator"
-version = "0.1.0"
+version = "0.1.1"
 main_exe = "imperator.exe"
 icon = "src-tauri/icons/icon.ico"
 accent = "#ef4444"
