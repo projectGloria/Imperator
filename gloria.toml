@@ -1,0 +1,10 @@
+id = "Imperator"
+name = "Imperator"
+version = "0.1.0"
+main_exe = "imperator.exe"
+icon = "src-tauri/icons/icon.ico"
+accent = "#ef4444"
+description = "System command center & desktop suite"
+needs_webview2 = true
+data_folders = ["%APPDATA%\\com.imperator.app", "%LOCALAPPDATA%\\com.imperator.app"]
+legacy_names = []
