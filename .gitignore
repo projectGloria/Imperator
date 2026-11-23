@@ -19,3 +19,4 @@ data/planner.json.tmp
 # Your own artwork: images stay local, only the README is tracked
 art/*
 !art/README.md
+[Dd]esktop.ini
